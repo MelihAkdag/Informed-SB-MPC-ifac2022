@@ -2,7 +2,7 @@
 
 import rospy
 import json
-from ros_mas_test.msg import ship_states, bcast_sitaw
+from informed_sbmpc.msg import ship_states, bcast_sitaw
 from rospy.numpy_msg import numpy_msg
 import numpy as np
 from config import *

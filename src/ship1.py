@@ -2,13 +2,14 @@
 
 from ftplib import all_errors
 import json
+import os
 from queue import Empty
 import rospy
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 import matplotlib.gridspec as gridspec
-from ros_mas_test.msg import ship_states, bcast_sitaw
+from informed_sbmpc.msg import ship_states, bcast_sitaw
 from rospy.numpy_msg import numpy_msg
 from ship_model import *
 from utility import *
@@ -170,7 +171,9 @@ def animate(i):
 
 ani = animation.FuncAnimation(fig, animate, init_func=init_ani,
                               frames=anim_length, interval=50, blit=False)
-ani.save("/home/parallels/catkin_ws/src/ros_mas_test/src/sim_results/animation.mp4")
+sim_results_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "sim_results")
+os.makedirs(sim_results_dir, exist_ok=True)
+ani.save(os.path.join(sim_results_dir, "animation.mp4"))
 plt.show()
 
 
@@ -184,7 +187,7 @@ plt.ylim(-4, 4)
 plt.title("Ship headings over time")
 plt.xlabel("Time")
 plt.ylabel("Heading [Radians]")
-plt.savefig('/home/parallels/catkin_ws/src/ros_mas_test/src/sim_results/Headings.png', dpi=300)
+plt.savefig(os.path.join(sim_results_dir, 'Headings.png'), dpi=300)
 
 # Speed graph
 plt.figure(figsize=(7, 7))
@@ -195,7 +198,7 @@ plt.ylim(-5, 20)
 plt.title("Speed changes over time")
 plt.xlabel("Time")
 plt.ylabel("Speed")
-plt.savefig('/home/parallels/catkin_ws/src/ros_mas_test/src/sim_results/Speeds.png', dpi=300)
+plt.savefig(os.path.join(sim_results_dir, 'Speeds.png'), dpi=300)
 
 # Distance graph
 plt.figure(figsize=(7, 7))
@@ -206,5 +209,5 @@ plt.grid()
 plt.title('Distance between ships over time')
 plt.xlabel('Time')
 plt.ylabel('Distance')
-plt.savefig('/home/parallels/catkin_ws/src/ros_mas_test/src/sim_results/Distance.png', dpi=300)
+plt.savefig(os.path.join(sim_results_dir, 'Distance.png'), dpi=300)
 """

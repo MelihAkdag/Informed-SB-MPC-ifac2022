@@ -6,8 +6,7 @@ Prototype implementation of **Informed Scenario-Based Model Predictive Control (
 negotiate COLREGs-compliant evasive manoeuvres via direct ship-to-ship messaging.
 
 This is the simplified prototype (2–3 ships, abstract head-on / crossing encounters) that
-accompanies the paper below. It was extracted from an earlier `src copy/` folder of a larger
-research repository.
+accompanies the paper below.
 
 ---
 
@@ -38,6 +37,60 @@ research repository.
 
 ---
 
+## Logical flow
+
+Every control step, each ship node runs `colav()` ([`src/colav.py`](src/colav.py)), which
+picks between *no action*, *reactive avoidance*, and *cooperative negotiation* based on the
+proximity of the target ships.
+
+**Decision thresholds** (from `colav()`):
+
+| Symbol | Value | Meaning |
+| --- | --- | --- |
+| `range_thr_1` | 4000 | Outer range: below this a collision risk is considered. |
+| `range_thr_2` | 1800 | Collaboration cutoff: inside this there is no time to negotiate. |
+| `dcpa_thr` | 1000 | Distance to Closest Point of Approach risk threshold. |
+| `tcpa_thr` | 100 | Time to Closest Point of Approach threshold. |
+
+**Step-by-step:**
+
+1. **Risk check.** If every target ship is farther than `range_thr_1` *or* every DCPA is
+   above `dcpa_thr`, there is no risk → keep the nominal course/speed (`NO COLAV`).
+2. **Risk exists** (any distance `< range_thr_1` or any DCPA `< dcpa_thr`):
+   - **Too close to negotiate** (any distance `< range_thr_2`): run **Informed SB-MPC**
+     (`sbmpc.get_optimal_ctrl_offset`) for an immediate reactive manoeuvre informed by the
+     other ships' communicated intent (`INFORMED SBMPC IS ACTIVE`).
+   - **Time to cooperate** (all distances `≥ range_thr_2`): run **Distributed SB-MPC**
+     negotiation via the `DirectMessage` service:
+     - A **stand-on** ship (`CR-SO` / `ON-SO` / `HO-GW`) asks the other ship's intention
+       with an `INT` message.
+     - A **give-way** ship computes its optimal offset (`dsbmpc.get_optimal_ctrl_offset`)
+       and sends it as a proposal (`PPS`).
+     - On each received `PPS`, the ship evaluates three candidate costs (cooperate with the
+       peer's proposal, counter-propose, or hold) and either sends a better `PPS` or accepts
+       with `ACK`.
+     - Once a proposal is acknowledged (`ACK`), both ships apply the agreed course/speed and
+       reset the negotiation for the next encounter.
+
+```mermaid
+flowchart TD
+    A[colav step] --> B{Any ship within range_thr_1<br/>or DCPA < dcpa_thr?}
+    B -- No --> C[NO COLAV<br/>keep nominal course/speed]
+    B -- Yes --> D{Any ship within range_thr_2?}
+    D -- Yes<br/>no time --> E[Informed SB-MPC<br/>reactive manoeuvre]
+    D -- No<br/>time to cooperate --> F[Distributed SB-MPC negotiation]
+    F --> G{COLREGs role}
+    G -- Stand-on --> H[Send INT<br/>request intention]
+    G -- Give-way --> I[Compute offset<br/>send PPS proposal]
+    H --> J[Exchange PPS proposals<br/>compare candidate costs]
+    I --> J
+    J --> K{Proposal accepted?}
+    K -- No --> J
+    K -- Yes ACK --> L[Apply agreed course/speed<br/>reset negotiation]
+```
+
+---
+
 ## Repository layout
 
 ```
@@ -58,15 +111,11 @@ src/
   mass_sim.launch       launch file: server + ships
 ```
 
-> The ROS package is still named `ros_mas_test` (the Python code imports
-> `ros_mas_test.msg` / `ros_mas_test.srv`). Rename the package only if you also update those
-> imports and the manifest.
-
 ---
 
 ## Dependencies
 
-**ROS 1** (rospy, catkin) — `rospy` and the `ros_mas_test.msg` / `ros_mas_test.srv` modules
+**ROS 1** (rospy, catkin) — `rospy` and the `informed_sbmpc.msg` / `informed_sbmpc.srv` modules
 come from the ROS install and the catkin build, **not** pip.
 
 **Python (pip):** see [`requirements.txt`](requirements.txt) — `numpy`, `pandas`,
@@ -81,7 +130,7 @@ pip install -r requirements.txt
 ## Build & run (ROS 1 / catkin)
 
 ```bash
-# 1) Place under a catkin workspace, e.g. ~/catkin_ws/src/ros_mas_test
+# 1) Place under a catkin workspace, e.g. ~/catkin_ws/src/informed_sbmpc
 # 2) Python deps
 pip install -r requirements.txt
 # 3) Build
@@ -91,15 +140,15 @@ source devel/setup.bash
 # 4) Master
 roscore
 # 5) Launch server + ships
-roslaunch ros_mas_test mass_sim.launch
+roslaunch informed_sbmpc mass_sim.launch
 ```
 
 Individual nodes:
 
 ```bash
-rosrun ros_mas_test server.py
-rosrun ros_mas_test ship1.py
-rosrun ros_mas_test ship2.py
+rosrun informed_sbmpc server.py
+rosrun informed_sbmpc ship1.py
+rosrun informed_sbmpc ship2.py
 ```
 
 ---

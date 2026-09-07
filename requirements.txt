@@ -1,6 +1,6 @@
 # Python (pip) dependencies for the Informed SB-MPC prototype
 # -----------------------------------------------------------------------------
-# NOTE: rospy and the ros_mas_test.msg / ros_mas_test.srv modules are NOT pip
+# NOTE: rospy and the informed_sbmpc.msg / informed_sbmpc.srv modules are NOT pip
 # packages. They come from your ROS 1 installation and from building this
 # catkin package (catkin_make / catkin build). See README.md.
 #

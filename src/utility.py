@@ -3,9 +3,9 @@ import pandas as pd
 import math
 import json
 import rospy
-from ros_mas_test.srv import DirectMessage
-from ros_mas_test.srv import DirectMessageRequest
-from ros_mas_test.srv import DirectMessageResponse
+from informed_sbmpc.srv import DirectMessage
+from informed_sbmpc.srv import DirectMessageRequest
+from informed_sbmpc.srv import DirectMessageResponse
 
 
 

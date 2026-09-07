@@ -3,7 +3,7 @@
 import rospy
 import numpy as np
 import json
-from ros_mas_test.msg import ship_states, bcast_sitaw
+from informed_sbmpc.msg import ship_states, bcast_sitaw
 from rospy.numpy_msg import numpy_msg
 from ship_model import *
 from utility import *

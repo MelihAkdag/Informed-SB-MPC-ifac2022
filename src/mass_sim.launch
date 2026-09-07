@@ -1,5 +1,5 @@
 <launch>
-  <node name="ship1" pkg="ros_mas_test" type="ship1.py" output="screen" />
-  <node name="ship2" pkg="ros_mas_test" type="ship2.py" output="screen" />
-  <node name="server" pkg="ros_mas_test" type="server.py" />
+  <node name="ship1" pkg="informed_sbmpc" type="ship1.py" output="screen" />
+  <node name="ship2" pkg="informed_sbmpc" type="ship2.py" output="screen" />
+  <node name="server" pkg="informed_sbmpc" type="server.py" />
 </launch>
