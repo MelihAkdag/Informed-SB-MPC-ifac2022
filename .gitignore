@@ -1,0 +1,18 @@
+# Byte-compiled / optimized files
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# ROS / catkin build artifacts
+build/
+devel/
+install/
+*.pyc
+
+# Runtime scratch
+waiting_list.pickle
+
+# OS / editor
+.vscode/
+.DS_Store
+Thumbs.db

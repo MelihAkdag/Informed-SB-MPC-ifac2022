@@ -1,0 +1,10 @@
+string header
+string sender
+string receiver
+int32 msg_id
+---
+string header
+string sender
+string receiver
+string traj_plan
+int32 msg_id

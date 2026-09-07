@@ -1,0 +1,13 @@
+# Python (pip) dependencies for the Informed SB-MPC prototype
+# -----------------------------------------------------------------------------
+# NOTE: rospy and the ros_mas_test.msg / ros_mas_test.srv modules are NOT pip
+# packages. They come from your ROS 1 installation and from building this
+# catkin package (catkin_make / catkin build). See README.md.
+#
+# Install with:   pip install -r requirements.txt
+# -----------------------------------------------------------------------------
+
+numpy
+pandas
+matplotlib          # trajectory plots / animation (ship1.py)
+shapely             # geometry / land-intersection checks (colav, map_polygons, sbmpc, dsbmpc)
