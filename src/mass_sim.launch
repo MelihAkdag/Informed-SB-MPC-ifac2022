@@ -1,4 +1,6 @@
 <launch>
+  <!-- Starts the two ship agents and the central situational-awareness server. -->
+  <!-- ship1 opens plots/animation (output="screen"); add ship3 for a 3-ship run. -->
   <node name="ship1" pkg="informed_sbmpc" type="ship1.py" output="screen" />
   <node name="ship2" pkg="informed_sbmpc" type="ship2.py" output="screen" />
   <node name="server" pkg="informed_sbmpc" type="server.py" />
